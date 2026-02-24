@@ -3,17 +3,14 @@ import "./hospitaldashboard.css";
 import { ref, update, get, onValue } from "firebase/database";
 import { db } from "./firebase";
 
-// 🏥 Departments config: UI id, label, and Firebase specialists key
 const DEPARTMENTS = [
   { id: "general_medicine", label: "General Medicine", dbKey: "general" },
   { id: "cardiology", label: "Cardiology", dbKey: "cardiac" },
   { id: "neurology", label: "Neurology", dbKey: "neurology" },
   { id: "orthopedics", label: "Orthopedics", dbKey: "orthopedic" },
   { id: "pulmonology", label: "Pulmonology", dbKey: "pulmonology" },
-  { id: "gastroenterology", label: "Gastroenterology", dbKey: "gastroenterology" },
   { id: "nephrology", label: "Nephrology", dbKey: "nephrology" },
   { id: "urology", label: "Urology", dbKey: "urology" },
-  { id: "endocrinology", label: "Endocrinology", dbKey: "endocrinology" },
   { id: "dermatology", label: "Dermatology", dbKey: "dermatology" },
   { id: "pediatrics", label: "Pediatrics", dbKey: "pediatrics" },
   { id: "gynecology", label: "Gynecology", dbKey: "gynecology" },
@@ -40,14 +37,12 @@ export default function HospitalDashboard() {
   const [hospitalsSnapshot, setHospitalsSnapshot] = useState(null);
   const [hospitalOptions, setHospitalOptions] = useState([]);
 
-  // 🔁 Live subscription to all hospitals so we always have最新 data
   useEffect(() => {
     const hospitalsRef = ref(db, "/hospitals");
     const unsubscribe = onValue(hospitalsRef, (snapshot) => {
       const raw = snapshot.val() || {};
       setHospitalsSnapshot(raw);
 
-      // Build options from live DB: key = "hospital1", label = hospital_name
       const opts = Object.entries(raw)
         .map(([key, arr]) => {
           const hospital = Array.isArray(arr) ? arr[0] : null;
@@ -86,13 +81,11 @@ export default function HospitalDashboard() {
   };
 
   const fetchHospitalData = async (hospitalKey, hospitalName) => {
-    // Prefer live snapshot if we already have it
     if (hospitalsSnapshot) {
       applyHospitalDataToForm(hospitalKey, hospitalName, hospitalsSnapshot);
       return;
     }
 
-    // Fallback one-time fetch
     const hospitalRef = ref(db, `/hospitals/${hospitalKey}/0`);
     const snapshot = await get(hospitalRef);
     if (snapshot.exists()) {
@@ -118,8 +111,6 @@ export default function HospitalDashboard() {
     }
   };
 
-  // When user types a hospital name and presses Enter,
-  // update the form with that hospital's data instead of submitting the whole form.
   const handleHospitalKeyDown = async (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -160,11 +151,9 @@ export default function HospitalDashboard() {
     const hospitalRef = ref(db, `/hospitals/${hospitalKey}/0`);
 
     const updates = {
-      // 🔁 Update just the fields we care about, preserving other data
       "availability/beds": Number(formData.availableBeds),
       "availability/icu_beds": Number(formData.icuBeds),
       status: formData.status,
-      // ⏱ Keep a human-readable timestamp alongside any existing field
       last_updated: new Date().toISOString(),
       last_updated_ms: Date.now()
     };
@@ -241,19 +230,6 @@ export default function HospitalDashboard() {
                 onChange={handleSpecialistChange}
               />
             ))}
-          </div>
-
-          <div className="form-group">
-            <label>Status</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-            >
-              <option value="Ready">🟢 Ready</option>
-              <option value="Filling Fast">🟡 Filling Fast</option>
-              <option value="Busy">🔴 Busy</option>
-            </select>
           </div>
 
           <button type="submit" className="submit-btn">

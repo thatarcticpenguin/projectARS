@@ -1,12 +1,11 @@
-/* Background */
 .dashboard-container {
-  min-height: 100vh;
-  min-width: 100vw;
-  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  flex: 1;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 20px;
+  box-sizing: border-box;
 }
 
 /* Glass Card */
@@ -20,6 +19,7 @@
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
   color: white;
   animation: fadeIn 0.6s ease-in-out;
+  margin: 0 auto;
 }
 
 /* Title */
