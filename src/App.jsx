@@ -1,6 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./Home";
 import PatientForm from "./PatientForm";
+import LoginPage from "./LoginPage";
+import MapView from "./MapView";
+import DashboardHospital from "./hospitaldashboard";
 
 function App() {
   return (
@@ -8,6 +11,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/form" element={<PatientForm />} />
+        <Route path="/hdash" element={<DashboardHospital />} />
       </Routes>
     </BrowserRouter>
   );
