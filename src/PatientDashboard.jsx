@@ -3,110 +3,122 @@ import { db } from "./firebase";
 import { ref, onValue } from "firebase/database";
 import "./PatientDashboard.css";
 
-export default function PatientDashboard({ hospitalId }) {
+export default function PatientDashboard({ adminHospital }) {
   const [patients, setPatients] = useState([]);
   const previousCount = useRef(0);
 
   useEffect(() => {
-    const patientsRef = ref(db, "patients");
+    if (!adminHospital?.firebaseKey) return;
+
+    // Read directly from this hospital's patients node
+    const patientsRef = ref(db, `hospitals/${adminHospital.firebaseKey}/patients`);
 
     const unsubscribe = onValue(patientsRef, (snapshot) => {
       const data = snapshot.val();
-
       if (data) {
-        const filteredPatients = Object.entries(data).
-        map(([id, value]) => ({ id, ...value })).
-        filter((patient) => patient.hospitalId === hospitalId);
+        const list = Object.entries(data)
+          .map(([id, value]) => ({ id, ...value }))
+          .sort((a, b) => (b.timestamp_ms ?? 0) - (a.timestamp_ms ?? 0)); // newest first
 
-        setPatients(filteredPatients);
+        setPatients(list);
 
-
-        if (filteredPatients.length > previousCount.current) {
-          const audio = new Audio(
-            "https://actions.google.com/sounds/v1/alarms/beep_short.ogg"
-          );
-          audio.play();
+        // Alert sound on new patient
+        if (list.length > previousCount.current) {
+          const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+          audio.play().catch(() => {});
         }
-
-        previousCount.current = filteredPatients.length;
+        previousCount.current = list.length;
       } else {
         setPatients([]);
+        previousCount.current = 0;
       }
     });
 
     return () => unsubscribe();
-  }, [hospitalId]);
+  }, [adminHospital?.firebaseKey]);
+
+  if (!adminHospital) {
+    return (
+      <div className="patient-dashboard-wrapper">
+        <div className="patient-dashboard-card">
+          <p style={{ color: "#ef4444", textAlign: "center" }}>
+            ⚠ No hospital linked. Please log in as a Hospital Admin.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="patient-dashboard-wrapper">
-    <div className="patient-dashboard-card">
-      <h2 className="dashboard-title">🚨 Emergency Incoming Patients</h2>
-
-      <div className="table-wrapper">
-        <table className="patient-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Age</th>
-              <th>Gender</th>
-              <th>Condition</th>
-              <th>Distance</th>
-              <th>ETA</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {patients.length === 0 ?
+      <div className="patient-dashboard-card">
+        <h2 className="dashboard-title">🚨 Incoming Patients — {adminHospital.name}</h2>
+        <div className="table-wrapper">
+          <table className="patient-table">
+            <thead>
               <tr>
-                <td colSpan="7" className="empty-state">
-                  No incoming emergencies 🚑
-                </td>
-              </tr> :
-
-              patients.map((patient) =>
-              <PatientRow key={patient.id} patient={patient} />
-              )
-              }
-          </tbody>
-        </table>
+                <th>Dept</th>
+                <th>Condition</th>
+                <th>Severity</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Golden Hour</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {patients.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="empty-state">
+                    No incoming emergencies 🚑
+                  </td>
+                </tr>
+              ) : (
+                patients.map((patient) => (
+                  <PatientRow key={patient.id} patient={patient} />
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-  </div>);
-
+  );
 }
 
 function PatientRow({ patient }) {
-  const [eta, setEta] = useState(patient.eta || 600);
+  const severityColor = {
+    critical: "#fee2e2",
+    moderate: "#fef9c3",
+    stable:   "#dcfce7",
+  }[patient.severity] ?? "transparent";
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setEta((prev) => prev > 0 ? prev - 1 : 0);
-    }, 1000);
+  const severityLabel = {
+    critical: "🔴 Critical",
+    moderate: "🟡 Moderate",
+    stable:   "🟢 Stable",
+  }[patient.severity] ?? patient.severity;
 
-    return () => clearInterval(interval);
-  }, []);
+  const timeStr = patient.timestamp
+    ? new Date(patient.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    : "—";
 
-  const formatTime = (seconds) => {
-    const min = Math.floor(seconds / 60);
-    const sec = seconds % 60;
-    return `${min}:${sec < 10 ? "0" : ""}${sec}`;
-  };
-
-  const rowClass =
-  patient.condition?.toLowerCase() === "critical" ?
-  "critical-row" :
-  "normal-row";
+  const deptLabel = patient.dept
+    ? patient.dept.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+    : "—";
 
   return (
-    <tr className={rowClass}>
-      <td>{patient.name}</td>
-      <td>{patient.age}</td>
-      <td>{patient.gender}</td>
-      <td>{patient.condition}</td>
-      <td>{patient.distance}</td>
-      <td>{formatTime(eta)}</td>
-      <td>{patient.status || "En Route"}</td>
-    </tr>);
-
+    <tr style={{ background: severityColor }}>
+      <td>{deptLabel}</td>
+      <td>{patient.disease ?? "—"}</td>
+      <td>{severityLabel}</td>
+      <td>{typeof patient.location === "object"
+        ? `${patient.location.lat?.toFixed(4)}, ${patient.location.lng?.toFixed(4)}`
+        : patient.location ?? "—"}
+      </td>
+      <td>{patient.status ?? "Incoming"}</td>
+      <td style={{ textAlign: "center" }}>{patient.isGoldenHour ? "⚡ Yes" : "—"}</td>
+      <td>{timeStr}</td>
+    </tr>
+  );
 }

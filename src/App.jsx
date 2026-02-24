@@ -8,100 +8,98 @@ import DashboardTabs from "./navtabs";
 import { db } from "./firebase";
 import { ref, onValue } from "firebase/database";
 
-
+// ─── Firebase → normalised hospital shape ────────────────────────────────────
 
 function parseHospitals(data) {
   if (!data) return [];
-  return Object.values(data).map((h) => {
-    const beds = h.availability?.beds ?? 0;
-    const icuBeds = h.availability?.icu_beds ?? 0;
-    const specialists = h.availability?.specialists ?? {};
+  return Object.entries(data).map(([firebaseKey, h]) => {
+    const beds            = h.availability?.beds     ?? 0;
+    const icuBeds         = h.availability?.icu_beds ?? 0;
+    const specialists     = h.availability?.specialists ?? {};
     const specialistCount = Object.values(specialists).reduce((a, b) => a + (Number(b) || 0), 0);
-    const statusMap = { Ready: "green", Busy: "yellow", Full: "red" };
-    const status = statusMap[h.status] ?? "green";
+    const statusMap       = { Ready: "green", Busy: "yellow", Full: "red" };
+    const status          = statusMap[h.status] ?? "green";
     return {
-      id: h.hospital_id,
-      firebaseKey: Object.keys(data).find((k) => data[k].hospital_id === h.hospital_id),
-      name: h.hospital_name,
-      lat: h.coordinates.lat,
-      lng: h.coordinates.lng,
+      id:             h.hospital_id,
+      firebaseKey,                        // key used for writing patients
+      name:           h.hospital_name,
+      lat:            h.coordinates.lat,
+      lng:            h.coordinates.lng,
       beds,
       icuBeds,
       specialists,
       specialistCount,
-      status
+      status,
     };
   });
 }
 
-
+// ─── Distance & scoring helpers ───────────────────────────────────────────────
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371;
+  const R    = 6371;
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
   const a =
-  Math.sin(dLat / 2) ** 2 +
-  Math.cos(lat1 * Math.PI / 180) *
-  Math.cos(lat2 * Math.PI / 180) *
-  Math.sin(dLon / 2) ** 2;
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) *
+    Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-
-
+// Score = beds*0.35 + icu*0.30 + specialists*0.20 + (1/travelTime)*0.15
 function scoreHospitals(hospitals) {
   if (!hospitals.length) return [];
-  const maxBeds = Math.max(...hospitals.map((h) => h.beds), 1);
-  const maxIcu = Math.max(...hospitals.map((h) => h.icuBeds), 1);
-  const maxSpec = Math.max(...hospitals.map((h) => h.specialistCount), 1);
-
-  return hospitals.map((h) => {
-    const travelTime = h.distance / 40 * 60 || 0.1;
+  const maxBeds = Math.max(...hospitals.map(h => h.beds), 1);
+  const maxIcu  = Math.max(...hospitals.map(h => h.icuBeds), 1);
+  const maxSpec = Math.max(...hospitals.map(h => h.specialistCount), 1);
+  return hospitals.map(h => {
+    const travelTime = (h.distance / 40) * 60 || 0.1;
     const score =
-    h.beds / maxBeds * 0.35 +
-    h.icuBeds / maxIcu * 0.30 +
-    h.specialistCount / maxSpec * 0.20 +
-    1 / travelTime * 0.15;
+      (h.beds / maxBeds)            * 0.35 +
+      (h.icuBeds / maxIcu)          * 0.30 +
+      (h.specialistCount / maxSpec) * 0.20 +
+      (1 / travelTime)              * 0.15;
     return { ...h, score };
   }).sort((a, b) => b.score - a.score);
 }
 
-
+// ─── PatientForm wrapper ──────────────────────────────────────────────────────
 
 function PatientFormPage() {
   const navigate = useNavigate();
   const handleSearch = (data) => {
+    // data.location is { lat, lng } from GPS
     navigate("/map", { state: { patientData: data } });
   };
   return <PatientForm onSubmit={handleSearch} />;
 }
 
-
+// ─── Hospital Finder ──────────────────────────────────────────────────────────
 
 function HospitalFinder() {
-  const [hospitals, setHospitals] = useState([]);
-  const [dbLoading, setDbLoading] = useState(true);
+  const [hospitals, setHospitals]               = useState([]);
+  const [dbLoading, setDbLoading]               = useState(true);
   const [selectedHospital, setSelectedHospital] = useState(null);
-  const [showAll, setShowAll] = useState(false);
+  const [showAll, setShowAll]                   = useState(false);
   const [navigationStarted, setNavigationStarted] = useState(false);
-  const [userLocation, setUserLocation] = useState(null);
-  const [patientData, setPatientData] = useState(null);
-
+  const [patientData, setPatientData]           = useState(null);
 
   const location = useLocation();
+
+  // Read patient data (including GPS coords) from router state
   useEffect(() => {
     if (location.state?.patientData) {
       setPatientData(location.state.patientData);
     }
   }, [location.state]);
 
-
+  // Real-time Firebase hospital feed
   useEffect(() => {
     const hospitalsRef = ref(db, "hospitals");
     const unsub = onValue(hospitalsRef, (snapshot) => {
-      const data = snapshot.val();
-      setHospitals(parseHospitals(data ?? {}));
+      setHospitals(parseHospitals(snapshot.val() ?? {}));
       setDbLoading(false);
     }, (err) => {
       console.error("Firebase error:", err);
@@ -110,45 +108,45 @@ function HospitalFinder() {
     return () => unsub();
   }, []);
 
-
-  useEffect(() => {
-    setUserLocation({ lat: 16.5733, lng: 80.3654, heading: null });
-  }, []);
+  // userLocation comes directly from patientData.location (GPS coords from PatientForm)
+  const userLocation = useMemo(() => {
+    if (patientData?.location?.lat && patientData?.location?.lng) {
+      return { lat: patientData.location.lat, lng: patientData.location.lng, heading: null };
+    }
+    return null;
+  }, [patientData]);
 
   const hospitalsWithDistance = useMemo(() =>
-  userLocation ?
-  hospitals.map((h) => ({
-    ...h,
-    distance: calculateDistance(userLocation.lat, userLocation.lng, h.lat, h.lng),
-    availabilityPercent: Math.round(h.beds / Math.max(h.beds + h.icuBeds, 1) * 100)
-  })) :
-  [],
-  [userLocation, hospitals]
+    userLocation
+      ? hospitals.map((h) => ({
+          ...h,
+          distance: calculateDistance(userLocation.lat, userLocation.lng, h.lat, h.lng),
+          availabilityPercent: Math.round((h.beds / Math.max(h.beds + h.icuBeds, 1)) * 100),
+        }))
+      : [],
+    [userLocation, hospitals]
   );
 
   const scoredHospitals = useMemo(() =>
-  scoreHospitals(hospitalsWithDistance.filter((h) => h.status !== "red")),
-  [hospitalsWithDistance]
+    scoreHospitals(hospitalsWithDistance.filter(h => h.status !== "red")),
+    [hospitalsWithDistance]
   );
 
   const recommended = scoredHospitals.slice(0, 2);
 
-  const getBarColor = (percent) => {
-    if (percent > 70) return "#16a34a";
-    if (percent > 40) return "#d97706";
-    return "#dc2626";
-  };
+  const getBarColor = (p) => p > 70 ? "#16a34a" : p > 40 ? "#d97706" : "#dc2626";
 
-  if (!userLocation || dbLoading) {
+  // Loading state
+  if (dbLoading || !userLocation) {
     return (
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center",
         justifyContent: "center", height: "60vh", gap: "16px", color: "#475569" }}>
         <span style={{ fontSize: 40 }}>📍</span>
         <p style={{ margin: 0, fontWeight: 600 }}>
-          {dbLoading ? "Loading hospital data…" : "Getting your location…"}
+          {dbLoading ? "Loading hospital data…" : "Waiting for location data…"}
         </p>
-      </div>);
-
+      </div>
+    );
   }
 
   if (selectedHospital) {
@@ -160,26 +158,29 @@ function HospitalFinder() {
         navigationStarted={navigationStarted}
         setNavigationStarted={setNavigationStarted}
         setSelectedHospital={setSelectedHospital}
-        patientData={patientData} />);
-
-
+        patientData={patientData}
+      />
+    );
   }
 
   return (
     <div style={{ padding: "20px" }}>
       <h2>Emergency Hospital Finder</h2>
-      {patientData &&
-      <div style={{ background: "#fef9c3", border: "1px solid #fde047", borderRadius: "8px",
-        padding: "10px 14px", marginBottom: "16px", fontSize: "14px" }}>
-          🚨 <strong>{patientData.severity?.toUpperCase()}</strong> — {patientData.disease} &nbsp;|&nbsp; {patientData.dept}
+
+      {patientData && (
+        <div style={{ background: "#fef9c3", border: "1px solid #fde047", borderRadius: "8px",
+          padding: "10px 14px", marginBottom: "16px", fontSize: "14px" }}>
+          🚨 <strong>{patientData.severity?.toUpperCase()}</strong> — {patientData.disease}
+          &nbsp;|&nbsp; {patientData.dept?.replace(/_/g, " ")}
+          {patientData.isGoldenHour && <span style={{ color: "#dc2626", fontWeight: "bold" }}> ⚡ GOLDEN HOUR</span>}
         </div>
-      }
+      )}
 
       <h3>Top Recommended</h3>
-      {recommended.map((h, index) =>
-      <div key={h.id} style={cardStyle(true)}
-      onClick={() => {setSelectedHospital(h);setNavigationStarted(false);}}>
-          <strong>#{index + 1} Recommended</strong> &nbsp;
+      {recommended.map((h, index) => (
+        <div key={h.id} style={cardStyle(true)}
+          onClick={() => { setSelectedHospital(h); setNavigationStarted(false); }}>
+          <strong>#{index + 1} Recommended</strong>&nbsp;
           <span style={{ fontSize: "12px", color: "#64748b" }}>Score: {(h.score * 100).toFixed(0)}</span><br />
           <strong>{h.name}</strong><br />
           Beds: {h.beds} &nbsp;|&nbsp; ICU: {h.icuBeds} &nbsp;|&nbsp; Specialists: {h.specialistCount}<br />
@@ -189,55 +190,55 @@ function HospitalFinder() {
           </div>
           <small>{h.availabilityPercent}% Bed Availability</small>
         </div>
-      )}
+      ))}
 
-      {!showAll && scoredHospitals.length > 2 &&
-      <button onClick={() => setShowAll(true)} style={viewMoreStyle}>
+      {!showAll && scoredHospitals.length > 2 && (
+        <button onClick={() => setShowAll(true)} style={viewMoreStyle}>
           View More ({scoredHospitals.length - 2} more)
         </button>
-      }
+      )}
 
-      {showAll &&
-      <>
+      {showAll && (
+        <>
           <h3 style={{ marginTop: "20px" }}>All Hospitals</h3>
-          {scoredHospitals.map((h) =>
-        <div key={h.id} style={cardStyle(false)}
-        onClick={() => {setSelectedHospital(h);setNavigationStarted(false);}}>
+          {scoredHospitals.map((h) => (
+            <div key={h.id} style={cardStyle(false)}
+              onClick={() => { setSelectedHospital(h); setNavigationStarted(false); }}>
               <strong>{h.name}</strong><br />
               Beds: {h.beds} &nbsp;|&nbsp; ICU: {h.icuBeds} &nbsp;|&nbsp; Specialists: {h.specialistCount}<br />
               Distance: {h.distance.toFixed(2)} km &nbsp;|&nbsp;
               Score: {(h.score * 100).toFixed(0)}
             </div>
-        )}
+          ))}
         </>
-      }
-    </div>);
-
+      )}
+    </div>
+  );
 }
 
-
+// ─── Styles ───────────────────────────────────────────────────────────────────
 
 const cardStyle = (isRecommended) => ({
   padding: "12px", marginBottom: "12px", background: "white",
   borderRadius: "8px", border: isRecommended ? "2px solid gold" : "1px solid #ddd",
-  cursor: "pointer"
+  cursor: "pointer",
 });
 
 const viewMoreStyle = {
   padding: "8px 14px", background: "#2563eb", color: "white",
-  border: "none", borderRadius: "6px", marginTop: "10px", cursor: "pointer"
+  border: "none", borderRadius: "6px", marginTop: "10px", cursor: "pointer",
 };
 
 const barContainer = {
   height: "8px", background: "#e5e7eb", borderRadius: "4px",
-  marginTop: "6px", marginBottom: "4px"
+  marginTop: "6px", marginBottom: "4px",
 };
 
 const barFill = {
-  height: "8px", borderRadius: "4px", transition: "width 0.4s ease"
+  height: "8px", borderRadius: "4px", transition: "width 0.4s ease",
 };
 
-
+// ─── Language Switcher ────────────────────────────────────────────────────────
 
 function LanguageSwitcher() {
   useEffect(() => {
@@ -269,11 +270,15 @@ function LanguageSwitcher() {
   return <div id="google_translate_element" style={{ minWidth: "160px" }} />;
 }
 
+// ─── Root App ─────────────────────────────────────────────────────────────────
 
+function AppInner() {
+  const location = useLocation();
+  const hideNav = ["/", "/register", "/login"].includes(location.pathname);
 
-function App() {
   return (
     <div className="min-h-screen w-full flex flex-col items-center bg-slate-50 font-sans">
+      {!hideNav && (
       <nav className="w-full h-16 bg-slate-900 flex items-center justify-between px-6 md:px-10 shadow-lg mb-10 shrink-0">
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -290,19 +295,25 @@ function App() {
           <LanguageSwitcher />
         </div>
       </nav>
+      )}
 
       <main className="w-full max-w-2xl px-4 pb-12 flex flex-col items-center">
         <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/login" element={<Signup />} />
-          <Route path="/form" element={<PatientFormPage />} />
-          <Route path="/hdash" element={<DashboardTabs />} />
-          <Route path="/map" element={<HospitalFinder />} />
+          <Route path="/"          element={<Login />} />
+          <Route path="/login"     element={<Login />} />
+          <Route path="/register"  element={<Signup />} />
+          <Route path="/form"      element={<PatientFormPage />} />
+          <Route path="/hdash"     element={<DashboardTabs />} />
+          <Route path="/map"       element={<HospitalFinder />} />
           <Route path="/hospitals" element={<HospitalFinder />} />
         </Routes>
       </main>
-    </div>);
+    </div>
+  );
+}
 
+function App() {
+  return <AppInner />;
 }
 
 export default App;
