@@ -4,23 +4,23 @@ import { ref, update, get, onValue } from "firebase/database";
 import { db } from "./firebase";
 
 const DEPARTMENTS = [
-  { id: "general_medicine", label: "General Medicine", dbKey: "general" },
-  { id: "cardiology", label: "Cardiology", dbKey: "cardiac" },
-  { id: "neurology", label: "Neurology", dbKey: "neurology" },
-  { id: "orthopedics", label: "Orthopedics", dbKey: "orthopedic" },
-  { id: "pulmonology", label: "Pulmonology", dbKey: "pulmonology" },
-  { id: "nephrology", label: "Nephrology", dbKey: "nephrology" },
-  { id: "urology", label: "Urology", dbKey: "urology" },
-  { id: "dermatology", label: "Dermatology", dbKey: "dermatology" },
-  { id: "pediatrics", label: "Pediatrics", dbKey: "pediatrics" },
-  { id: "gynecology", label: "Gynecology", dbKey: "gynecology" },
-  { id: "ent", label: "ENT", dbKey: "ent" },
-  { id: "ophthalmology", label: "Ophthalmology", dbKey: "ophthalmology" },
-  { id: "psychiatry", label: "Psychiatry", dbKey: "psychiatry" },
-  { id: "oncology", label: "Oncology", dbKey: "oncology" },
-  { id: "radiology", label: "Radiology", dbKey: "radiology" },
-  { id: "anesthesiology", label: "Anesthesiology", dbKey: "anesthesiology" }
-];
+{ id: "general_medicine", label: "General Medicine", dbKey: "general" },
+{ id: "cardiology", label: "Cardiology", dbKey: "cardiac" },
+{ id: "neurology", label: "Neurology", dbKey: "neurology" },
+{ id: "orthopedics", label: "Orthopedics", dbKey: "orthopedic" },
+{ id: "pulmonology", label: "Pulmonology", dbKey: "pulmonology" },
+{ id: "nephrology", label: "Nephrology", dbKey: "nephrology" },
+{ id: "urology", label: "Urology", dbKey: "urology" },
+{ id: "dermatology", label: "Dermatology", dbKey: "dermatology" },
+{ id: "pediatrics", label: "Pediatrics", dbKey: "pediatrics" },
+{ id: "gynecology", label: "Gynecology", dbKey: "gynecology" },
+{ id: "ent", label: "ENT", dbKey: "ent" },
+{ id: "ophthalmology", label: "Ophthalmology", dbKey: "ophthalmology" },
+{ id: "psychiatry", label: "Psychiatry", dbKey: "psychiatry" },
+{ id: "oncology", label: "Oncology", dbKey: "oncology" },
+{ id: "radiology", label: "Radiology", dbKey: "radiology" },
+{ id: "anesthesiology", label: "Anesthesiology", dbKey: "anesthesiology" }];
+
 
 export default function HospitalDashboard() {
   const [formData, setFormData] = useState({
@@ -42,35 +42,35 @@ export default function HospitalDashboard() {
   useEffect(() => {
     console.log("📱 HospitalDashboard component mounted");
     console.log("🔗 DB instance:", db);
-    
+
     const hospitalsRef = ref(db, "/hospitals");
     console.log("📍 Reading from path: /hospitals");
-    
+
     const unsubscribe = onValue(
       hospitalsRef,
       (snapshot) => {
         const raw = snapshot.val();
         console.log("✅ Firebase snapshot received, exists:", snapshot.exists());
         console.log("🔥 Firebase data received:", raw);
-        
+
         if (!raw) {
           console.warn("⚠️ No data returned from Firebase");
           setHospitalOptions([]);
           return;
         }
-        
+
         setHospitalsSnapshot(raw);
 
-        const opts = Object.entries(raw)
-          .map(([key, hospital]) => {
-            console.log(`  - Processing ${key}:`, hospital?.hospital_name);
-            if (!hospital || !hospital.hospital_name) {
-              console.warn(`  ⚠️ Skipping ${key}: missing hospital_name`);
-              return null;
-            }
-            return { key, label: hospital.hospital_name };
-          })
-          .filter(Boolean);
+        const opts = Object.entries(raw).
+        map(([key, hospital]) => {
+          console.log(`  - Processing ${key}:`, hospital?.hospital_name);
+          if (!hospital || !hospital.hospital_name) {
+            console.warn(`  ⚠️ Skipping ${key}: missing hospital_name`);
+            return null;
+          }
+          return { key, label: hospital.hospital_name };
+        }).
+        filter(Boolean);
 
         console.log("✅ Hospital options parsed:", opts);
         setHospitalOptions(opts);
@@ -81,7 +81,7 @@ export default function HospitalDashboard() {
         console.error("    Message:", error.message);
       }
     );
-    
+
     return () => {
       console.log("🧹 Cleaning up HospitalDashboard");
       unsubscribe();
@@ -91,11 +91,11 @@ export default function HospitalDashboard() {
   const applyHospitalDataToForm = (hospitalKey, hospitalName, rootData) => {
     console.log(`🏥 applyHospitalDataToForm called for: ${hospitalKey}`);
     console.log(`📦 rootData keys:`, Object.keys(rootData || {}));
-    
+
     const hospital = rootData?.[hospitalKey];
     console.log(`🔍 Hospital found:`, !!hospital);
     console.log(`📊 Hospital data:`, hospital);
-    
+
     if (!hospital) {
       console.warn(`⚠️ No hospital data found for key: ${hospitalKey}`);
       return;
@@ -106,7 +106,7 @@ export default function HospitalDashboard() {
 
     setFormData((prev) => {
       const specialistsFromDb = hospital?.availability?.specialists || {};
-      
+
       const specialistsState = { ...prev.specialists };
 
       DEPARTMENTS.forEach((d) => {
@@ -121,7 +121,7 @@ export default function HospitalDashboard() {
         status: hospital?.status ?? "Ready",
         specialists: specialistsState
       };
-      
+
       console.log("✅ New formData state being set:", {
         hospital: newFormData.hospital,
         availableBeds: newFormData.availableBeds,
@@ -135,7 +135,7 @@ export default function HospitalDashboard() {
   const fetchHospitalData = async (hospitalKey, hospitalName) => {
     console.log(`🔍 fetchHospitalData called for: ${hospitalKey}`);
     console.log(`📸 hospitalsSnapshot available:`, !!hospitalsSnapshot);
-    
+
     if (hospitalsSnapshot) {
       console.log(`✅ Using cached snapshot, keys:`, Object.keys(hospitalsSnapshot));
       console.log(`🔑 Looking for key: ${hospitalKey}`);
@@ -148,7 +148,7 @@ export default function HospitalDashboard() {
     const hospitalRef = ref(db, `/hospitals/${hospitalKey}`);
     const snapshot = await get(hospitalRef);
     console.log(`📦 Firebase fetch complete, exists:`, snapshot.exists());
-    
+
     if (snapshot.exists()) {
       const single = snapshot.val();
       console.log(`✅ Data fetched from Firebase:`, single);
@@ -162,7 +162,7 @@ export default function HospitalDashboard() {
 
   const handleHospitalChange = (e) => {
     const hospitalName = e.target.value;
-    
+
     setFormData((prev) => ({
       ...prev,
       hospital: hospitalName
@@ -174,7 +174,7 @@ export default function HospitalDashboard() {
       setFilteredHospitals(hospitalOptions);
     } else {
       const filtered = hospitalOptions.filter((h) =>
-        h.label.toLowerCase().includes(hospitalName.toLowerCase())
+      h.label.toLowerCase().includes(hospitalName.toLowerCase())
       );
       setFilteredHospitals(filtered);
     }
@@ -182,14 +182,14 @@ export default function HospitalDashboard() {
 
   const handleHospitalSelect = async (selectedLabel, selectedKey) => {
     console.log(`👆 Hospital selected: ${selectedLabel} (${selectedKey})`);
-    
+
     setFormData((prev) => ({
       ...prev,
       hospital: selectedLabel
     }));
     setShowDropdown(false);
     setFilteredHospitals([]);
-    
+
     console.log("📡 Fetching hospital data...");
     await fetchHospitalData(selectedKey, selectedLabel);
     console.log("✅ Hospital data fetched and form updated");
@@ -270,50 +270,50 @@ export default function HospitalDashboard() {
                 autoComplete="off"
                 placeholder="Search and select hospital..."
                 style={{ width: "100%", boxSizing: "border-box" }}
-                required
-              />
-              {showDropdown && (
+                required />
+              
+              {showDropdown &&
+              <div
+                style={{
+                  position: "absolute",
+                  top: "100%",
+                  left: 0,
+                  right: 0,
+                  background: "white",
+                  border: "1px solid #cbd5e1",
+                  borderTop: "none",
+                  borderRadius: "0 0 8px 8px",
+                  maxHeight: "250px",
+                  overflowY: "auto",
+                  zIndex: 1000,
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  marginTop: "-1px"
+                }}>
+                
+                  {filteredHospitals.length > 0 ?
+                filteredHospitals.map((h) =>
                 <div
+                  key={h.key}
+                  onClick={() => handleHospitalSelect(h.label, h.key)}
                   style={{
-                    position: "absolute",
-                    top: "100%",
-                    left: 0,
-                    right: 0,
-                    background: "white",
-                    border: "1px solid #cbd5e1",
-                    borderTop: "none",
-                    borderRadius: "0 0 8px 8px",
-                    maxHeight: "250px",
-                    overflowY: "auto",
-                    zIndex: 1000,
-                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                    marginTop: "-1px"
+                    padding: "10px 15px",
+                    cursor: "pointer",
+                    borderBottom: "1px solid #f1f5f9",
+                    transition: "background 0.15s"
                   }}
-                >
-                  {filteredHospitals.length > 0 ? (
-                    filteredHospitals.map((h) => (
-                      <div
-                        key={h.key}
-                        onClick={() => handleHospitalSelect(h.label, h.key)}
-                        style={{
-                          padding: "10px 15px",
-                          cursor: "pointer",
-                          borderBottom: "1px solid #f1f5f9",
-                          transition: "background 0.15s"
-                        }}
-                        onMouseEnter={(e) => (e.target.style.background = "#f0f9ff")}
-                        onMouseLeave={(e) => (e.target.style.background = "transparent")}
-                      >
+                  onMouseEnter={(e) => e.target.style.background = "#f0f9ff"}
+                  onMouseLeave={(e) => e.target.style.background = "transparent"}>
+                  
                         {h.label}
                       </div>
-                    ))
-                  ) : (
-                    <div style={{ padding: "10px 15px", color: "#94a3b8", textAlign: "center" }}>
+                ) :
+
+                <div style={{ padding: "10px 15px", color: "#94a3b8", textAlign: "center" }}>
                       {hospitalOptions.length === 0 ? "Loading hospitals..." : "No hospitals found"}
                     </div>
-                  )}
+                }
                 </div>
-              )}
+              }
             </div>
           </div>
 
@@ -325,8 +325,8 @@ export default function HospitalDashboard() {
                 name="availableBeds"
                 value={formData.availableBeds}
                 onChange={handleChange}
-                required
-              />
+                required />
+              
             </div>
 
             <div className="form-group">
@@ -336,24 +336,24 @@ export default function HospitalDashboard() {
                 name="icuBeds"
                 value={formData.icuBeds}
                 onChange={handleChange}
-                required
-              />
+                required />
+              
             </div>
           </div>
 
           <h4>Specialists Availability</h4>
 
           <div className="grid-3">
-            {DEPARTMENTS.map((d) => (
-              <input
-                key={d.id}
-                type="number"
-                name={d.id}
-                placeholder={d.label}
-                value={formData.specialists[d.id]}
-                onChange={handleSpecialistChange}
-              />
-            ))}
+            {DEPARTMENTS.map((d) =>
+            <input
+              key={d.id}
+              type="number"
+              name={d.id}
+              placeholder={d.label}
+              value={formData.specialists[d.id]}
+              onChange={handleSpecialistChange} />
+
+            )}
           </div>
 
           <button type="submit" className="submit-btn">
@@ -361,6 +361,6 @@ export default function HospitalDashboard() {
           </button>
         </form>
       </div>
-    </div>
-  );
+    </div>);
+
 }

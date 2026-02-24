@@ -1,9 +1,7 @@
-/* ================================================
-   GOOGLE TRANSLATE FIXES
-   ================================================ */
 
 
-/* 1. Hide the top banner/frame completely */
+
+
 
 .goog-te-banner-frame,
 .goog-te-banner-frame.skiptranslate,
@@ -13,7 +11,7 @@
 }
 
 
-/* 2. Prevent body being pushed down */
+
 
 body {
     margin: 0;
@@ -26,7 +24,7 @@ body {
 }
 
 
-/* 3. Hide "Powered by Google Translate" text and icon */
+
 
 .goog-te-gadget-icon,
 .goog-te-gadget span:not(.goog-te-menu-value),
@@ -35,7 +33,7 @@ body {
 }
 
 
-/* 4. Reset gadget container */
+
 
 .goog-te-gadget {
     font-size: 14px !important;
@@ -44,7 +42,7 @@ body {
 }
 
 
-/* 5. Style language dropdown */
+
 
 .goog-te-combo {
     display: inline-block !important;
@@ -84,9 +82,7 @@ body {
 }
 
 
-/* ================================================
-   GLOBAL APP STYLES
-   ================================================ */
+
 
 :root {
     font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -138,7 +134,7 @@ button:focus-visible {
 }
 
 
-/* Animations */
+
 
 @keyframes spin {
     to {
@@ -162,7 +158,7 @@ button:focus-visible {
 }
 
 
-/* Light mode */
+
 
 @media (prefers-color-scheme: light) {
      :root {

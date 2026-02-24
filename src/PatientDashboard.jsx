@@ -14,13 +14,13 @@ export default function PatientDashboard({ hospitalId }) {
       const data = snapshot.val();
 
       if (data) {
-        const filteredPatients = Object.entries(data)
-          .map(([id, value]) => ({ id, ...value }))
-          .filter((patient) => patient.hospitalId === hospitalId);
+        const filteredPatients = Object.entries(data).
+        map(([id, value]) => ({ id, ...value })).
+        filter((patient) => patient.hospitalId === hospitalId);
 
         setPatients(filteredPatients);
 
-        // 🔔 Alert sound for new patient
+
         if (filteredPatients.length > previousCount.current) {
           const audio = new Audio(
             "https://actions.google.com/sounds/v1/alarms/beep_short.ogg"
@@ -38,7 +38,7 @@ export default function PatientDashboard({ hospitalId }) {
   }, [hospitalId]);
 
   return (
-  <div className="patient-dashboard-wrapper">
+    <div className="patient-dashboard-wrapper">
     <div className="patient-dashboard-card">
       <h2 className="dashboard-title">🚨 Emergency Incoming Patients</h2>
 
@@ -57,23 +57,23 @@ export default function PatientDashboard({ hospitalId }) {
           </thead>
 
           <tbody>
-            {patients.length === 0 ? (
+            {patients.length === 0 ?
               <tr>
                 <td colSpan="7" className="empty-state">
                   No incoming emergencies 🚑
                 </td>
-              </tr>
-            ) : (
-              patients.map((patient) => (
-                <PatientRow key={patient.id} patient={patient} />
-              ))
-            )}
+              </tr> :
+
+              patients.map((patient) =>
+              <PatientRow key={patient.id} patient={patient} />
+              )
+              }
           </tbody>
         </table>
       </div>
     </div>
-  </div>
-);
+  </div>);
+
 }
 
 function PatientRow({ patient }) {
@@ -81,7 +81,7 @@ function PatientRow({ patient }) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setEta((prev) => (prev > 0 ? prev - 1 : 0));
+      setEta((prev) => prev > 0 ? prev - 1 : 0);
     }, 1000);
 
     return () => clearInterval(interval);
@@ -94,9 +94,9 @@ function PatientRow({ patient }) {
   };
 
   const rowClass =
-    patient.condition?.toLowerCase() === "critical"
-      ? "critical-row"
-      : "normal-row";
+  patient.condition?.toLowerCase() === "critical" ?
+  "critical-row" :
+  "normal-row";
 
   return (
     <tr className={rowClass}>
@@ -107,6 +107,6 @@ function PatientRow({ patient }) {
       <td>{patient.distance}</td>
       <td>{formatTime(eta)}</td>
       <td>{patient.status || "En Route"}</td>
-    </tr>
-  );
+    </tr>);
+
 }

@@ -9,7 +9,7 @@ body,
 }
 
 
-/* ===== Global safety reset ===== */
+
 
 *,
 *::before,
@@ -18,7 +18,7 @@ body,
 }
 
 
-/* ===== Full-screen fixed dashboard shell ===== */
+
 
 .patient-dashboard-wrapper {
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
@@ -34,7 +34,7 @@ body,
 }
 
 
-/* ===== Main glass card ===== */
+
 
 .patient-dashboard-card {
     width: 100%;
@@ -52,7 +52,7 @@ body,
 }
 
 
-/* ===== Title ===== */
+
 
 .dashboard-title {
     margin: 0 0 18px 0;
@@ -65,7 +65,7 @@ body,
 }
 
 
-/* ===== Scroll area ONLY for table ===== */
+
 
 .table-wrapper {
     flex: 1;
@@ -75,7 +75,7 @@ body,
 }
 
 
-/* ===== Table ===== */
+
 
 .patient-table {
     width: 100%;
@@ -85,7 +85,7 @@ body,
 }
 
 
-/* Header */
+
 
 .patient-table thead {
     background: rgba(0, 0, 0, 0.05);
@@ -103,7 +103,7 @@ body,
 }
 
 
-/* Body */
+
 
 .patient-table td {
     padding: 12px;
@@ -115,7 +115,7 @@ body,
 }
 
 
-/* ===== Row states ===== */
+
 
 .normal-row {
     background: transparent;
@@ -127,7 +127,7 @@ body,
 }
 
 
-/* Pulse without overflow */
+
 
 @keyframes pulse {
     0% {
@@ -142,7 +142,7 @@ body,
 }
 
 
-/* ===== ETA highlight ===== */
+
 
 .patient-table td:nth-child(6) {
     font-weight: 600;
@@ -150,14 +150,14 @@ body,
 }
 
 
-/* ===== Status ===== */
+
 
 .patient-table td:last-child {
     font-weight: 500;
 }
 
 
-/* ===== Empty state ===== */
+
 
 .empty-state {
     text-align: center;

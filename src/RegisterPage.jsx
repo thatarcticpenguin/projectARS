@@ -63,31 +63,31 @@ function Signup({ switchToLogin }) {
       <select
         value={role}
         onChange={(e) => setRole(e.target.value)}
-        style={inputStyle}
-      >
+        style={inputStyle}>
+        
         <option value="user">Paramedic</option>
         <option value="admin">Hospital Admin</option>
       </select>
 
-      {role === "admin" && (
-        <>
+      {role === "admin" &&
+      <>
           <input
-            type="text"
-            placeholder="Hospital Name"
-            value={hospitalName}
-            onChange={(e) => setHospitalName(e.target.value)}
-            style={inputStyle}
-          />
+          type="text"
+          placeholder="Hospital Name"
+          value={hospitalName}
+          onChange={(e) => setHospitalName(e.target.value)}
+          style={inputStyle} />
+        
 
           <input
-            type="text"
-            placeholder="Employee ID"
-            value={employeeId}
-            onChange={(e) => setEmployeeId(e.target.value)}
-            style={inputStyle}
-          />
+          type="text"
+          placeholder="Employee ID"
+          value={employeeId}
+          onChange={(e) => setEmployeeId(e.target.value)}
+          style={inputStyle} />
+        
         </>
-      )}
+      }
 
       <input
         type="text"
@@ -95,10 +95,10 @@ function Signup({ switchToLogin }) {
         maxLength="10"
         value={phone}
         onChange={(e) =>
-          setPhone(e.target.value.replace(/\D/g, ""))
+        setPhone(e.target.value.replace(/\D/g, ""))
         }
-        style={inputStyle}
-      />
+        style={inputStyle} />
+      
 
       <input
         type="text"
@@ -106,54 +106,54 @@ function Signup({ switchToLogin }) {
         maxLength="12"
         value={aadhaar}
         onChange={(e) =>
-          setAadhaar(e.target.value.replace(/\D/g, ""))
+        setAadhaar(e.target.value.replace(/\D/g, ""))
         }
-        style={inputStyle}
-      />
+        style={inputStyle} />
+      
 
-      {!otpSent ? (
-        <button style={buttonStyle} onClick={handleSendOtp}>
+      {!otpSent ?
+      <button style={buttonStyle} onClick={handleSendOtp}>
           Send OTP
-        </button>
-      ) : (
-        <>
+        </button> :
+
+      <>
           <input
-            type="text"
-            placeholder="Enter OTP (Demo: 1234)"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            style={inputStyle}
-          />
+          type="text"
+          placeholder="Enter OTP (Demo: 1234)"
+          value={otp}
+          onChange={(e) => setOtp(e.target.value)}
+          style={inputStyle} />
+        
 
           <input
-            type="password"
-            placeholder="Password (min 7 characters)"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={inputStyle}
-          />
+          type="password"
+          placeholder="Password (min 7 characters)"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={inputStyle} />
+        
 
           <input
-            type="password"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            style={inputStyle}
-          />
+          type="password"
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          style={inputStyle} />
+        
 
           <button style={buttonStyle} onClick={handleSignup}>
             Register
           </button>
         </>
-      )}
+      }
 
       <p style={linkStyle} onClick={switchToLogin}>
         Already registered? Login
       </p>
 
       {message && <p style={{ marginTop: "10px" }}>{message}</p>}
-    </>
-  );
+    </>);
+
 }
 
 const inputStyle = {
@@ -161,7 +161,7 @@ const inputStyle = {
   padding: "10px",
   marginBottom: "15px",
   borderRadius: "6px",
-  border: "1px solid #ccc",
+  border: "1px solid #ccc"
 };
 
 const buttonStyle = {
@@ -171,14 +171,14 @@ const buttonStyle = {
   border: "none",
   backgroundColor: "#2a5298",
   color: "white",
-  cursor: "pointer",
+  cursor: "pointer"
 };
 
 const linkStyle = {
   marginTop: "15px",
   fontSize: "14px",
   color: "#2a5298",
-  cursor: "pointer",
+  cursor: "pointer"
 };
 
 export default Signup;

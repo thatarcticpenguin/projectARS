@@ -1,11 +1,11 @@
-// Import the functions you need from the SDKs you need
+
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
+
+
+
 const firebaseConfig = {
   apiKey: "AIzaSyBnFvGMImnUQoe8dGtq32Yz-a8_6bMtjFQ",
   authDomain: "projectyelamudhram.firebaseapp.com",
@@ -17,7 +17,7 @@ const firebaseConfig = {
   measurementId: "G-4GCSQCJFF0"
 };
 
-// Initialize Firebase
+
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
@@ -32,18 +32,18 @@ function distanceKm(lat1, lon1, lat2, lon2) {
   const dLon = (lon2 - lon1) * Math.PI / 180;
 
   const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1 * Math.PI / 180) *
-    Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon / 2) ** 2;
+  Math.sin(dLat / 2) ** 2 +
+  Math.cos(lat1 * Math.PI / 180) *
+  Math.cos(lat2 * Math.PI / 180) *
+  Math.sin(dLon / 2) ** 2;
 
   return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 }
 
 function calculateScore(beds, icu, specialists, distanceKm) {
   const distanceScore = Math.max(0, 10 - distanceKm);
-  
-  // FORMULA
+
+
   return (beds * 0.35 + icu * 0.30 + specialists * 0.20 + distanceScore * 0.15).toFixed(2);}
 
 document.getElementById("find").addEventListener("click", async () => {
@@ -60,7 +60,7 @@ document.getElementById("find").addEventListener("click", async () => {
     const beds = hospital.availability.beds;
     const icu = hospital.availability.icu_beds;
     const specialistsOnDuty =
-      hospital.availability.specialists[specialist] || 0;
+    hospital.availability.specialists[specialist] || 0;
 
     const dist = distanceKm(
       userLocation.lat,
