@@ -12,6 +12,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/form" element={<PatientForm />} />
         <Route path="/hdash" element={<DashboardHospital />} />
+        <Route path="/map" element={<MapView />} />
       </Routes>
     </BrowserRouter>
   );
