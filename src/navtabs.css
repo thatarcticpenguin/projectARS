@@ -4,7 +4,7 @@ body {
     padding: 0;
     overflow: hidden;
     scrollbar-gutter: unset;
-    /* nuclear option */
+    
 }
 
 #root {
@@ -15,7 +15,7 @@ body {
 }
 
 
-/* Fullscreen shell */
+
 
 .dashboard-tabs-wrapper {
     position: fixed;
@@ -29,7 +29,7 @@ body {
 }
 
 
-/* Tabs container */
+
 
 .tabs-header {
     display: flex;
@@ -40,7 +40,7 @@ body {
 }
 
 
-/* Buttons */
+
 
 .tab-btn {
     padding: 12px 26px;
@@ -72,7 +72,7 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
     display: flex;
-    /* add this */
+    
     flex-direction: column;
-    /* add this */
+    
 }

@@ -11,25 +11,25 @@ export default function DashboardTabs({ hospitalId }) {
       <div className="tabs-header">
         <button
           className={`tab-btn ${activeTab === "hospital" ? "active" : ""}`}
-          onClick={() => setActiveTab("hospital")}
-        >
+          onClick={() => setActiveTab("hospital")}>
+          
           🏥 Hospital Control
         </button>
 
         <button
           className={`tab-btn ${activeTab === "patients" ? "active" : ""}`}
-          onClick={() => setActiveTab("patients")}
-        >
+          onClick={() => setActiveTab("patients")}>
+          
           🚨 Incoming Patients
         </button>
       </div>
 
       <div className="tab-content">
         {activeTab === "hospital" && <HospitalDashboard />}
-        {activeTab === "patients" && (
-          <PatientDashboard hospitalId={hospitalId} />
-        )}
+        {activeTab === "patients" &&
+        <PatientDashboard hospitalId={hospitalId} />
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 }

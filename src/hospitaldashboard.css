@@ -10,7 +10,7 @@
 }
 
 
-/* Glass Card */
+
 
 .dashboard-card {
     background: rgba(255, 255, 255, 0.95);
@@ -30,7 +30,7 @@
 }
 
 
-/* Title */
+
 
 .dashboard-card h2 {
     text-align: center;
@@ -39,7 +39,7 @@
 }
 
 
-/* Form Groups */
+
 
 .form-group {
     margin-bottom: 20px;
@@ -55,7 +55,7 @@
 }
 
 
-/* Inputs */
+
 
 input,
 select {
@@ -76,7 +76,7 @@ input:focus {
 }
 
 
-/* Dropdown wrapper */
+
 
 div[style*="position: relative"] {
     overflow: visible !important;
@@ -85,7 +85,7 @@ div[style*="position: relative"] {
 
 }
 
-/* Grid Layouts */
+
 .grid-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -98,7 +98,7 @@ div[style*="position: relative"] {
     margin-bottom: 20px;
 }
 
-/* Button */
+
 .submit-btn {
     width: 100%;
     padding: 12px;
@@ -116,7 +116,7 @@ div[style*="position: relative"] {
     box-shadow: 0 0 20px rgba(0, 114, 255, 0.7);
 }
 
-/* Animation */
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -129,7 +129,7 @@ div[style*="position: relative"] {
     }
 }
 
-/* Responsive */
+
 @media (max-width: 600px) {
     .grid-2,
     .grid-3 {
