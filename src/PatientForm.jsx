@@ -77,11 +77,12 @@ export default function PatientForm() {
       beds,
       icu,
       specialistsOnDuty,
-      score: Number(score)
+      score: Number(score)   // 👈 ensure numeric
     };
   });
 
-    computed.sort((a, b) => b.score - a.score);
+  // 🔥 SORT BY SCORE (HIGH → LOW)
+  computed.sort((a, b) => b.score - a.score);
 
   setResults(computed);
 }
@@ -119,4 +120,3 @@ export default function PatientForm() {
     </div>
   );
 }
-
