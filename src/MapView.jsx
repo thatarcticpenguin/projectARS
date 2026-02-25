@@ -11,7 +11,9 @@ import {
   useMap
 } from 'react-leaflet'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { db } from './firebase'
+import { ref, push } from 'firebase/database'
 
 /* 🏥 ORIGINAL HOSPITAL PIN (RESTORED) */
 const hospitalIcon = (status) => {
@@ -142,9 +144,51 @@ function MapView({
   selectedHospital,
   navigationStarted,
   setNavigationStarted,
-  setSelectedHospital // Added prop for back
+  setSelectedHospital,
+  patientData
 }) {
   const markerRefs = useRef({})
+  const [sending, setSending] = useState(false)
+  const [sent, setSent] = useState(false)
+
+  const handleSendPatient = async (hospital) => {
+    setSending(true)
+    try {
+      const paramedic = JSON.parse(sessionStorage.getItem("paramedic") || "{}")
+      const patientRef = ref(db, `hospitals/${hospital.firebaseKey}/patients`)
+      await push(patientRef, {
+        timestamp:      new Date().toISOString(),
+        timestamp_ms:   Date.now(),
+        status:         "incoming",
+        dept:           patientData?.dept         ?? "general_medicine",
+        disease:        patientData?.disease      ?? "Unknown",
+        severity:       patientData?.severity     ?? "critical",
+        location:       patientData?.location     ?? "Unknown",
+        isGoldenHour:   patientData?.isGoldenHour ?? false,
+        paramedic:      {
+          id:    paramedic.id || "unknown",
+          name:  paramedic.name || "Unknown",
+          phone: paramedic.phone || "N/A",
+        },
+        assignedHospital: {
+          id:   hospital.id,
+          name: hospital.name,
+        }
+      })
+      setSent(true)
+    } catch (err) {
+      console.error("Failed to send patient:", err)
+      alert("Failed to send patient details. Please try again.")
+    } finally {
+      setSending(false)
+    }
+  }
+
+  const handleClose = () => {
+    setSelectedHospital(null)
+    setNavigationStarted(false)
+    setSent(false)
+  }
 
   return (
     <div style={{ position: 'relative', height: '100vh' }}>
@@ -230,6 +274,68 @@ function MapView({
       >
         Back
       </button>
+
+      {/* ── Bottom send panel ── */}
+      {selectedHospital && (
+        <div style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 9999,
+          background: "white",
+          padding: "16px 20px",
+          boxShadow: "0 -4px 24px rgba(0,0,0,0.18)",
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px"
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <strong style={{ fontSize: "16px" }}>{selectedHospital.name}</strong><br />
+              <span style={{ fontSize: "13px", color: "#64748b" }}>
+                Beds: {selectedHospital.beds} &nbsp;|&nbsp; Distance: {selectedHospital.distance?.toFixed(2)} km away
+              </span>
+            </div>
+            <button onClick={handleClose} style={{
+              background: "#ef4444", border: "none", fontSize: "24px",
+              cursor: "pointer", color: "white", lineHeight: 1, width: "40px", height: "40px",
+              borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
+              transition: "background 0.2s", flexShrink: 0
+            }} onMouseEnter={(e) => e.target.style.background = "#dc2626"} 
+               onMouseLeave={(e) => e.target.style.background = "#ef4444"}>
+              ✕
+            </button>
+          </div>
+
+          {sent ? (
+            <div style={{
+              background: "#dcfce7", color: "#16a34a", borderRadius: "8px",
+              padding: "14px", textAlign: "center", fontWeight: "bold", fontSize: "15px"
+            }}>
+              ✅ Patient details sent to {selectedHospital.name}!
+            </div>
+          ) : (
+            <button
+              onClick={() => handleSendPatient(selectedHospital)}
+              disabled={sending}
+              style={{
+                padding: "14px",
+                background: sending ? "#94a3b8" : "#dc2626",
+                color: "white",
+                border: "none",
+                borderRadius: "10px",
+                cursor: sending ? "not-allowed" : "pointer",
+                fontWeight: "bold",
+                fontSize: "15px",
+                transition: "background 0.2s"
+              }}
+            >
+              {sending ? "Sending…" : "📋 Send Patient Details to Hospital"}
+            </button>
+          )}
+        </div>
+      )}
 
     </div>
   )

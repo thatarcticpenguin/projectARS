@@ -357,12 +357,6 @@ function Signup() {
               >
                 Paramedic
               </button>
-              <button
-                className={`su-pill ${role === "admin" ? "active" : ""}`}
-                onClick={() => setRole("admin")}
-              >
-                Hospital Admin
-              </button>
             </div>
           </div>
 

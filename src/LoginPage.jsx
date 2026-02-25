@@ -301,10 +301,48 @@ function Login() {
     setMsg("OTP sent! Demo OTP: 1234", "info");
   };
 
-  const handleVerifyOtp = () => {
+  const handleVerifyOtp = async () => {
     if (otp === "1234") {
-      setMsg("✓ Login successful! Welcome back.", "success");
-      setTimeout(() => navigate("/form"), 800);
+      setLoading(true);
+      try {
+        // Fetch user data from Firebase based on phone number
+        const snapshot = await get(ref(db, "users"));
+        const usersData = snapshot.val();
+        
+        if (!usersData) {
+          setMsg("User database not found.", "error");
+          setLoading(false);
+          return;
+        }
+
+        // Find user by phone number
+        const userEntry = Object.entries(usersData).find(([, user]) =>
+          user.phone === parseInt(phone)
+        );
+
+        if (!userEntry) {
+          setMsg("Phone number not registered in system.", "error");
+          setLoading(false);
+          return;
+        }
+
+        const [userId, userData] = userEntry;
+        setMsg(`✓ Welcome, ${userData.name}!`, "success");
+
+        // Store user context in sessionStorage for the form
+        sessionStorage.setItem("paramedic", JSON.stringify({
+          id: userId,
+          name: userData.name,
+          phone: userData.phone,
+        }));
+
+        setTimeout(() => navigate("/form"), 800);
+      } catch (err) {
+        console.error("Verification error:", err);
+        setMsg("Login failed. Please try again.", "error");
+      } finally {
+        setLoading(false);
+      }
     } else {
       setMsg("Invalid OTP. Please try again.", "error");
     }

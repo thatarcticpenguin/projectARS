@@ -17,6 +17,7 @@ const PatientForm = ({ onSubmit }) => {
   const [loading, setLoading] = useState(false);
   const [coords, setCoords] = useState(null); // { lat, lng }
   const [locStatus, setLocStatus] = useState("detecting"); // "detecting" | "ready" | "error"
+  const [paramedic, setParamedic] = useState(null); // Paramedic info from session
 
   // Full department → conditions map
   const departmentData = {
@@ -45,6 +46,12 @@ const PatientForm = ({ onSubmit }) => {
   // Inject spin animation
   useEffect(() => {
     injectSpinKeyframe();
+    
+    // Fetch paramedic info from sessionStorage
+    const paramedicsData = sessionStorage.getItem("paramedic");
+    if (paramedicsData) {
+      setParamedic(JSON.parse(paramedicsData));
+    }
   }, []);
 
   // Auto-detect GPS location on mount
@@ -129,6 +136,7 @@ const PatientForm = ({ onSubmit }) => {
         severity: "critical",
         location: coords,
         isGoldenHour: true,
+        paramedic: paramedic,
       });
       setLoading(false);
     }, 1000);
@@ -143,7 +151,13 @@ const PatientForm = ({ onSubmit }) => {
     setError("");
     setLoading(true);
     setTimeout(() => {
-      onSubmit({ dept, disease, severity, location: coords });
+      onSubmit({ 
+        dept, 
+        disease, 
+        severity, 
+        location: coords,
+        paramedic: paramedic,
+      });
       setLoading(false);
     }, 1500);
   };
@@ -166,6 +180,14 @@ const PatientForm = ({ onSubmit }) => {
           fontSize: "14px",
         }}
       />
+
+      {paramedic && (
+        <div style={{ marginBottom: "12px", padding: "12px", background: "#eff6ff", borderRadius: "8px", borderLeft: "4px solid #3b82f6" }}>
+          <p style={{ margin: 0, fontSize: "14px", color: "#1e40af", fontWeight: "500" }}>
+            Welcome, <strong>{paramedic.name}</strong>! 👋
+          </p>
+        </div>
+      )}
 
       <h2 style={styles.title}>
         <span style={{ fontSize: "2rem" }}>🚑</span> Emergency Patient Intake
