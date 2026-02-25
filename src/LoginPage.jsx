@@ -7,14 +7,19 @@ const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
   .login-root {
-    min-height: 100vh;
+    height: 100vh;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     background: #f0f2f5;
     font-family: 'Inter', sans-serif;
     overflow: hidden;
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
 
   .login-root::before { display: none; }
@@ -355,9 +360,9 @@ function Login() {
       <div className="login-root">
         <div className="login-card">
           <div className="login-header">
-            <div className="login-eyebrow"></div>
+            <div className="login-eyebrow">RapidResQ</div>
             <h1 className="login-title">
-              {role === "admin" ? "Admin\nSign In" : otpSent ? "Verify your\nnumber" : "Welcome\nback"}
+              {role === "admin" ? "Admin\nSign In" : otpSent ? "Verify your\nnumber" : "Welcome"}
             </h1>
             <p className="login-subtitle">
               {role === "admin"

@@ -5,14 +5,19 @@ const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
   .signup-root {
-    min-height: 100vh;
+    height: 100vh;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     background: #f0f2f5;
     font-family: 'Inter', sans-serif;
     overflow: hidden;
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
 
   .signup-root::before { display: none; }
@@ -337,7 +342,7 @@ function Signup() {
       <div className="signup-root">
         <div className="su-card">
           <div className="su-header">
-            <div className="su-eyebrow"></div>
+            <div className="su-eyebrow">RapidResQ</div>
             <h1 className="su-title">Create your{"\n"}account</h1>
             <p className="su-subtitle">Join to get started</p>
           </div>
