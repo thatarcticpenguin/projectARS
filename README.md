@@ -42,7 +42,7 @@ npm run dev
 
 ### Paramedic Page
 - Open homepage of the site, login page appears
-- Open the paramedic login and use any phone number and click verify OTP.
+- Open the paramedic login and use phone number `7386635458` and click verify OTP.
 - Enter the demo OTP "1234".
 
 ### Paramedic form
