@@ -43,32 +43,35 @@ npm run dev
 - Open homepage of the site, login page appears
 - Open the paramedic login and use any phone number and click verify OTP.
 - Enter the demo OTP "1234".
+
 ### Paramedic form
 - System asks for current location access, click allow.
 - Once location initializes, select any department and any condition from the dropdown and click search facilities [OR] click on red golden hour button for traumacare override.
+
 ### Map and scoring
 - Top 2 best hospitals are shown according to scoring logic.
 - Select any of the hospitals from the list.
 - The map UI opens, you can select any hospital from the map view or choose the preselected hospital.
 - Once a hospitals is selected, click on "Start Directions".
 - Once you have fixed your hospital, click on "Send patient details to Hospital".
+
 ### Hospital Dashboard
 - Return to the homepage and open the hospital admin tab.
 - Login to the hospital that you had previously selected in the map.
-List of Hospital Usernames and passwords:
-| Hospital | Employee ID | Password |
-|---|---|---|
-| Apollo Diagnostics, Vijayawada | APOVJAC001 | 33330000 |
-| Vijaya Super Speciality Hospital, Vijayawada | VIJVJAC001 | 324324 |
-| Manipal Hospital, Vijayawada | MANVJAC001 | 243000 |
-| Manvi Hospital, Vijayawada | MVIVJAC001 | 9275097 |
-| Srikara Hospitals, Vijayawada | SRIVJAOT001 | 0823754 |
-| Ankura Hospital for Children and Women, Vijayawada | ANKVJAKN001 | 0923533 |
-| Mithra Multispeciality Hospital, Vijayawada | MITMVJAC001 | mithra123 |
-| Royal Hospitals, Vijayawada | ROYVJAC001 | royal123 |
-| Latha Super Speciality Hospital, Vijayawada | LATVJAC001 | latha123 |
-| Anil Neuro and Trauma Care, Vijayawada | ANIVJAC001 | anil123 |
-| Capital Hospitals, Vijayawada | CAPVJAC001 | capital123 |
+
+**Hospital Credentials:**
+
+1. **Apollo Diagnostics, Vijayawada** — `APOVJAC001` / `33330000`
+2. **Vijaya Super Speciality Hospital, Vijayawada** — `VIJVJAC001` / `324324`
+3. **Manipal Hospital, Vijayawada** — `MANVJAC001` / `243000`
+4. **Manvi Hospital, Vijayawada** — `MVIVJAC001` / `9275097`
+5. **Srikara Hospitals, Vijayawada** — `SRIVJAOT001` / `0823754`
+6. **Ankura Hospital for Children and Women, Vijayawada** — `ANKVJAKN001` / `0923533`
+7. **Mithra Multispeciality Hospital, Vijayawada** — `MITMVJAC001` / `mithra123`
+8. **Royal Hospitals, Vijayawada** — `ROYVJAC001` / `royal123`
+9. **Latha Super Speciality Hospital, Vijayawada** — `LATVJAC001` / `latha123`
+10. **Anil Neuro and Trauma Care, Vijayawada** — `ANIVJAC001` / `anil123`
+11. **Capital Hospitals, Vijayawada** — `CAPVJAC001` / `capital123`
 
 - Once logged in, try editing the beds or icu beds or specialists, and click update availability, notice that data gets changed in maps and list of best hospitals. Data will persist in cloud.
 - Go to the "Incoming Patients" tab and find the form you had earlier filled appearing in the dashboard of the hospital you selected in the map.
@@ -77,6 +80,7 @@ List of Hospital Usernames and passwords:
 ## 👥 Team Contributions
 
 Our team collaborated across the full stack to ensure a seamless integration between the ambulance interface and hospital databases.
+
 🛠️ Tech Stack
 
   - Frontend: React.js (Component-based UI) (Srujana)
