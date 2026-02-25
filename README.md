@@ -59,16 +59,16 @@ List of Hospital Usernames and passwords:
 | Hospital | Employee ID | Password |
 |---|---|---|
 | Apollo Diagnostics, Vijayawada | APOVJAC001 | 33330000 |
-| Vijaya Super Speciality Hospital | VIJVJAC001 | 324324 |
-| Manipal Hospital | MANVJAC001 | 243000 |
-| Manvi Hospital | MVIVJAC001 | 9275097 |
-| Srikara Hospitals | SRIVJAOT001 | 0823754 |
-| Ankura Hospital | ANKVJAKN001 | 0923533 |
-| Mithra Multispeciality Hospital | MITMVJAC001 | mithra123 |
-| Royal Hospitals | ROYVJAC001 | royal123 |
-| Latha Super Speciality Hospital | LATVJAC001 | latha123 |
-| Anil Neuro and Trauma Care | ANIVJAC001 | anil123 |
-| Capital Hospitals | CAPVJAC001 | capital123 |
+| Vijaya Super Speciality Hospital, Vijayawada | VIJVJAC001 | 324324 |
+| Manipal Hospital, Vijayawada | MANVJAC001 | 243000 |
+| Manvi Hospital, Vijayawada | MVIVJAC001 | 9275097 |
+| Srikara Hospitals, Vijayawada | SRIVJAOT001 | 0823754 |
+| Ankura Hospital for Children and Women, Vijayawada | ANKVJAKN001 | 0923533 |
+| Mithra Multispeciality Hospital, Vijayawada | MITMVJAC001 | mithra123 |
+| Royal Hospitals, Vijayawada | ROYVJAC001 | royal123 |
+| Latha Super Speciality Hospital, Vijayawada | LATVJAC001 | latha123 |
+| Anil Neuro and Trauma Care, Vijayawada | ANIVJAC001 | anil123 |
+| Capital Hospitals, Vijayawada | CAPVJAC001 | capital123 |
 
 - Once logged in, try editing the beds or icu beds or specialists, and click update availability, notice that data gets changed in maps and list of best hospitals. Data will persist in cloud.
 - Go to the "Incoming Patients" tab and find the form you had earlier filled appearing in the dashboard of the hospital you selected in the map.
