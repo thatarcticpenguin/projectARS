@@ -7,14 +7,19 @@ const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
   .login-root {
-    min-height: 100vh;
+    height: 100vh;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     background: #f0f2f5;
     font-family: 'Inter', sans-serif;
     overflow: hidden;
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
 
   .login-root::before { display: none; }
@@ -296,10 +301,48 @@ function Login() {
     setMsg("OTP sent! Demo OTP: 1234", "info");
   };
 
-  const handleVerifyOtp = () => {
+  const handleVerifyOtp = async () => {
     if (otp === "1234") {
-      setMsg("✓ Login successful! Welcome back.", "success");
-      setTimeout(() => navigate("/form"), 800);
+      setLoading(true);
+      try {
+        // Fetch user data from Firebase based on phone number
+        const snapshot = await get(ref(db, "users"));
+        const usersData = snapshot.val();
+        
+        if (!usersData) {
+          setMsg("User database not found.", "error");
+          setLoading(false);
+          return;
+        }
+
+        // Find user by phone number
+        const userEntry = Object.entries(usersData).find(([, user]) =>
+          user.phone === parseInt(phone)
+        );
+
+        if (!userEntry) {
+          setMsg("Phone number not registered in system.", "error");
+          setLoading(false);
+          return;
+        }
+
+        const [userId, userData] = userEntry;
+        setMsg(`✓ Welcome, ${userData.name}!`, "success");
+
+        // Store user context in sessionStorage for the form
+        sessionStorage.setItem("paramedic", JSON.stringify({
+          id: userId,
+          name: userData.name,
+          phone: userData.phone,
+        }));
+
+        setTimeout(() => navigate("/form"), 800);
+      } catch (err) {
+        console.error("Verification error:", err);
+        setMsg("Login failed. Please try again.", "error");
+      } finally {
+        setLoading(false);
+      }
     } else {
       setMsg("Invalid OTP. Please try again.", "error");
     }
@@ -355,9 +398,9 @@ function Login() {
       <div className="login-root">
         <div className="login-card">
           <div className="login-header">
-            <div className="login-eyebrow"></div>
+            <div className="login-eyebrow">RapidResQ</div>
             <h1 className="login-title">
-              {role === "admin" ? "Admin\nSign In" : otpSent ? "Verify your\nnumber" : "Welcome\nback"}
+              {role === "admin" ? "Admin\nSign In" : otpSent ? "Verify your\nnumber" : "Welcome"}
             </h1>
             <p className="login-subtitle">
               {role === "admin"
